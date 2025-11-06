@@ -46,6 +46,121 @@ def extract_user_message(body: Dict[str, Any]) -> str:
     return ""
 
 
+def extract_all_user_messages(body: Dict[str, Any]) -> List[str]:
+    """Extract all user messages in the conversation chain (not system reminders)."""
+    messages = body.get('messages', [])
+    user_messages = []
+
+    for msg in messages:
+        if msg.get('role') == 'user':
+            content = msg.get('content', '')
+            if isinstance(content, str):
+                # Skip system reminders
+                if not content.strip().startswith('<system-reminder>'):
+                    user_messages.append(content)
+            elif isinstance(content, list):
+                for block in content:
+                    if isinstance(block, dict) and block.get('type') == 'text':
+                        text = block.get('text', '')
+                        if not text.strip().startswith('<system-reminder>'):
+                            user_messages.append(text)
+                            break  # Only take first text block per message
+
+    return user_messages
+
+
+def format_message_with_indent(msg: str, prefix: str, max_length: int = 150) -> str:
+    """Format a message with proper indentation for multi-line content.
+
+    Args:
+        msg: The message text
+        prefix: The prefix (e.g., "       [1] User: ")
+        max_length: Maximum length before truncating
+
+    Returns:
+        Formatted message with proper indentation
+    """
+    indent = " " * len(prefix)
+
+    if len(msg) >= max_length:
+        # Truncate but still apply indentation to newlines within the truncated portion
+        truncated = msg[:100]
+        lines_in_truncated = truncated.split('\n')
+        formatted_truncated = lines_in_truncated[0]
+        for line in lines_in_truncated[1:]:
+            formatted_truncated += '\n' + indent + line
+        return f"{prefix}{formatted_truncated}... [{len(msg)} chars]"
+
+    # Split on newlines and indent continuation lines
+    lines_in_msg = msg.split('\n')
+    formatted_msg = lines_in_msg[0]
+    for line in lines_in_msg[1:]:
+        formatted_msg += '\n' + indent + line
+
+    return f"{prefix}{formatted_msg}"
+
+
+def extract_conversation_chain(body: Dict[str, Any]) -> List[tuple[str, str]]:
+    """Extract all messages in the conversation chain with roles.
+    Returns list of (role, content) tuples."""
+    messages = body.get('messages', [])
+    conversation = []
+
+    for msg in messages:
+        role = msg.get('role', 'unknown')
+        content = msg.get('content', '')
+
+        if role == 'user':
+            # Extract user text or tool results, skip system reminders
+            if isinstance(content, str):
+                if not content.strip().startswith('<system-reminder>'):
+                    conversation.append(('user', content))
+            elif isinstance(content, list):
+                text_found = False
+                tool_results = []
+
+                for block in content:
+                    if isinstance(block, dict):
+                        if block.get('type') == 'text':
+                            text = block.get('text', '')
+                            if not text.strip().startswith('<system-reminder>'):
+                                conversation.append(('user', text))
+                                text_found = True
+                                break
+                        elif block.get('type') == 'tool_result':
+                            tool_results.append(block.get('tool_use_id', 'unknown'))
+
+                # If no text but has tool results, add a marker
+                if not text_found and tool_results:
+                    conversation.append(('tool_result', f"[Tool results received: {len(tool_results)} result(s)]"))
+
+        elif role == 'assistant':
+            # Extract assistant response
+            if isinstance(content, str):
+                conversation.append(('assistant', content))
+            elif isinstance(content, list):
+                # Combine text blocks and note tool uses
+                texts = []
+                tools = []
+                for block in content:
+                    if isinstance(block, dict):
+                        if block.get('type') == 'text':
+                            texts.append(block.get('text', ''))
+                        elif block.get('type') == 'tool_use':
+                            tools.append(block.get('name', 'unknown'))
+
+                response_parts = []
+                if texts:
+                    response_parts.append(' '.join(texts))
+                if tools:
+                    response_parts.append(f"[Called tools: {', '.join(tools)}]")
+
+                if response_parts:
+                    conversation.append(('assistant', ' '.join(response_parts)))
+
+    return conversation
+
+
 def extract_tool_calls(response_body: str) -> List[str]:
     """Extract tool names called in response."""
     try:
@@ -85,7 +200,7 @@ def classify_endpoint_type(url: str, method: str) -> tuple[str, str]:
         ('oauth', 'AUTH', 'OAuth authentication'),
         ('organization', 'AUTH', 'Organization access check'),
         ('count_tokens', 'VALIDATE', 'Token count validation'),
-        ('/api/hello', 'HEALTH', 'Health check / phase delimiter'),
+        ('/api/hello', 'HEALTH', 'Health check'),
         ('/v1/messages', 'MESSAGE', 'API message request'),
     ]
 
@@ -164,23 +279,30 @@ def classify_message_purpose(body: Dict[str, Any], user_msg: str, response_body:
     return f"❓ Unknown model: {model}"
 
 
-def analyze_detailed_flow(entries: List[Dict[str, Any]], version: str) -> str:
-    """Generate detailed flow showing all requests with full context."""
+def analyze_request_flow(entries: List[Dict[str, Any]], version: str) -> str:
+    """Generate request flow showing all requests with full context."""
 
     lines = []
     lines.append("=" * 120)
-    lines.append(f"DETAILED API FLOW - Claude Code v{version}")
+    lines.append(f"REQUEST FLOW - Claude Code v{version}")
     lines.append("=" * 120)
     lines.append("")
     lines.append("NOTE: This analysis auto-detects request types and handles unknowns gracefully.")
-    lines.append("      Health checks (GET /api/hello) are used as phase delimiters.")
+    lines.append("      Turns are marked by 'Detect if new topic' Haiku calls (user interactions).")
     lines.append("")
     lines.append("=" * 120)
 
-    # Track phases and unknown patterns
-    health_check_count = 0
+    # Track turns and unknown patterns
+    turn_number = 0
     unknown_endpoints = []
     unknown_message_types = []
+
+    # Start with Turn 0 - Initialization
+    lines.append("")
+    lines.append("  " + "─" * 116)
+    lines.append(f"  🎬 Turn {turn_number} - Initialization")
+    lines.append("  " + "─" * 116)
+    lines.append("")
 
     for idx, entry in enumerate(entries):
         url = entry.get('request', {}).get('url', '')
@@ -197,24 +319,28 @@ def analyze_detailed_flow(entries: List[Dict[str, Any]], version: str) -> str:
         if req_type == "UNKNOWN":
             unknown_endpoints.append((method, url))
 
-        # Handle health checks as phase delimiters
-        if req_type == "HEALTH":
-            health_check_count += 1
-            lines.append("")
-            lines.append("  " + "─" * 116)
-            lines.append(f"  ⬇️  Phase {health_check_count} completed - Health check")
-            lines.append("  " + "─" * 116)
-            lines.append("")
-
         # Handle message requests with full detail
-        elif req_type == "MESSAGE" and body:
+        if req_type == "MESSAGE" and body:
             user_msg = extract_user_message(body)
+            all_user_msgs = extract_all_user_messages(body)
             model = body.get('model', 'unknown')
             has_system = bool(body.get('system'))
             has_tools = bool(body.get('tools'))
             msg_count = len(body.get('messages', []))
 
             purpose = classify_message_purpose(body, user_msg, response_raw)
+
+            # Check if this is a "Detect if new topic" message - marks a new turn
+            if "Detect if new topic" in purpose:
+                turn_number += 1
+                # Get the actual user prompt - strip newlines for single-line display
+                prompt_single_line = user_msg.replace('\n', ' ').replace('\r', ' ')
+                next_prompt = prompt_single_line if len(prompt_single_line) <= 80 else prompt_single_line[:77] + "..."
+                lines.append("")
+                lines.append("  " + "─" * 116)
+                lines.append(f"  💬 Turn {turn_number} - {next_prompt}")
+                lines.append("  " + "─" * 116)
+                lines.append("")
 
             # Track unknown patterns
             if "unknown pattern" in purpose.lower() or "unknown model" in purpose.lower():
@@ -227,10 +353,39 @@ def analyze_detailed_flow(entries: List[Dict[str, Any]], version: str) -> str:
             details.append(f"Model: {model}")
             details.append(f"Msgs: {msg_count}, System: {has_system}, Tools: {has_tools}")
 
-            if user_msg and user_msg.strip() and len(user_msg) < 200:
-                details.append(f"📥 User: {user_msg[:150]}")
-            elif user_msg and len(user_msg) >= 200:
-                details.append(f"📥 User: {user_msg[:100]}... [{len(user_msg)} chars]")
+            # Display full conversation chain
+            conversation = extract_conversation_chain(body)
+            if conversation:
+                if len(conversation) == 1:
+                    # Single message - show it inline with proper indentation
+                    role, msg = conversation[0]
+                    if role == "tool_result":
+                        emoji = "🔧"
+                        role_label = "Tool"
+                    elif role == "user":
+                        emoji = "📥"
+                        role_label = "User"
+                    else:
+                        emoji = "💬"
+                        role_label = "Assistant"
+
+                    prefix = f"{emoji} {role_label}: "
+                    formatted = format_message_with_indent(msg, prefix, max_length=200)
+                    details.append(formatted)
+                else:
+                    # Multiple messages - show full conversation with proper indentation
+                    details.append(f"💬 Conversation ({len(conversation)} messages in chain):")
+                    for i, (role, msg) in enumerate(conversation, 1):
+                        if role == "tool_result":
+                            role_label = "Tool"
+                        elif role == "user":
+                            role_label = "User"
+                        else:
+                            role_label = "Assistant"
+
+                        prefix = f"       [{i}] {role_label}: "
+                        formatted = format_message_with_indent(msg, prefix, max_length=150)
+                        details.append(formatted)
 
             if tool_calls:
                 details.append(f"🔧 Tools called: {', '.join(tool_calls)}")
@@ -251,7 +406,7 @@ def analyze_detailed_flow(entries: List[Dict[str, Any]], version: str) -> str:
     lines.append("ANALYSIS SUMMARY")
     lines.append("=" * 120)
     lines.append(f"Total requests: {len(entries)}")
-    lines.append(f"Health check phases: {health_check_count}")
+    lines.append(f"Total turns: {turn_number}")
 
     if unknown_endpoints:
         lines.append("")
@@ -301,7 +456,7 @@ def main():
     print(f"Analyzing {file_path.name}...")
     entries = load_jsonl(file_path)
 
-    report = analyze_detailed_flow(entries, version)
+    report = analyze_request_flow(entries, version)
     print(report)
 
 

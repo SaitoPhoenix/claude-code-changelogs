@@ -8,7 +8,7 @@ This project evaluates a trace of raw API calls made when using Claude Code, the
 
 - **System prompts** - The core instructions that define Claude Code's behavior
 - **Tool definitions** - The tools available to Claude Code and their specifications
-- **Data flows** - Detailed analysis of how raw API calls are structured and sequenced
+- **Request flows** - Detailed analysis of how raw API calls are structured and sequenced
 
 Trace's are captured using the claude-trace tool by badlogic.  You can find the tool [here](https://github.com/badlogic/lemmy/tree/main/apps/claude-trace).
 
@@ -24,17 +24,21 @@ View changes to Claude Code's available tools across versions - additions, remov
 
 View changes to Claude Code's core system prompt - the instructions that define its behavior, capabilities, and operational guidelines.
 
+### 📋 [Request Flow Changelog](request_flow_changelog.md)
+
+View changes to Claude Code's API request flow patterns - tracking request additions, removals, reordering, model changes, and orchestration logic evolution across versions.
+
 ### 📅 [Version Dates](version_dates.md)
 
 Reference for Claude Code version publication dates.
 
-## Detailed Flows
+## Request Flows
 
-For in-depth analysis of specific version behaviors, detailed API flow analyses are available in `output/detailed_flows/`.
+For in-depth analysis of specific version behaviors, API request flow analyses are available in `output/request_flows/`.
 
 ### Flow Structure
 
-Each detailed flow file (`detailed_flow_*.txt`) contains:
+Each request flow file (`request_flow_*.txt`) contains:
 
 - **Request Sequence** - Chronological order of API requests with types and purposes
 - **User Messages** - The actual prompts and interactions from the user
@@ -116,9 +120,9 @@ python src/extract_tools.py --extract-all
 
 ---
 
-### 3. `detailed_flow.py`
+### 3. `request_flow.py`
 
-Analyzes Claude Code API traces and shows detailed request flows.
+Analyzes Claude Code API traces and shows request flows.
 
 **What it does:**
 - Loads and parses `.jsonl` trace files
@@ -130,12 +134,12 @@ Analyzes Claude Code API traces and shows detailed request flows.
 
 **Usage:**
 ```bash
-python src/detailed_flow.py <trace.jsonl>
+python src/request_flow.py <trace.jsonl>
 ```
 
 **Example:**
 ```bash
-python src/detailed_flow.py .claude-trace/api-trace_2.0.30.jsonl
+python src/request_flow.py .claude-trace/api-trace_2.0.30.jsonl
 ```
 
 **Output:**
@@ -168,7 +172,7 @@ Typical workflow for analyzing Claude Code versions:
 
 4. **Analyze flow** (optional):
    ```bash
-   python src/detailed_flow.py .claude-trace/api-trace_2.0.30.jsonl > output/detailed_flows/detailed_flow_2.0.30.txt
+   python src/request_flow.py .claude-trace/api-trace_2.0.30.jsonl > output/request_flows/request_flow_2.0.30.txt
    ```
 
 5. **Update changelogs** (manual workflow):
@@ -195,7 +199,7 @@ Typical workflow for analyzing Claude Code versions:
 ├── src/                               # Python scripts
 │   ├── extract_system_prompts.py      # Extract system prompts
 │   ├── extract_tools.py               # Extract tool definitions
-│   └── detailed_flow.py               # Analyze API flows
+│   └── request_flow.py                # Analyze API flows
 │
 ├── output/                            # Generated outputs
 │   ├── system_prompts/                # Extracted system prompts
@@ -207,8 +211,8 @@ Typical workflow for analyzing Claude Code versions:
 │   │   ├── tools_no_mcp_*.txt         # Core tools only (text)
 │   │   ├── tools_no_mcp_*.json        # Core tools only (JSON)
 │   │   └── metadata.json
-│   └── detailed_flows/                # API flow analyses
-│       └── detailed_flow_*.txt
+│   └── request_flows/                 # API flow analyses
+│       └── request_flow_*.txt
 │
 └── .claude-trace/                     # Input trace files
     └── log-*.jsonl
@@ -216,7 +220,7 @@ Typical workflow for analyzing Claude Code versions:
 
 ## Features
 
-### Detailed Flow Analysis
+### Request Flow Analysis
 - Automatic request type detection
 - Graceful handling of unknown endpoints and patterns
 - Tool call tracking
