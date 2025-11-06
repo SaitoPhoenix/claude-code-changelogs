@@ -9,3 +9,5 @@ Once the session starts, input these prompts in order.  The content doesn't matt
   2. Reverse the order of the numbers in the DATA field.
 
 In rare instances, the agent prompt may fail.  If it does, just start over with a new session and input the prompts again.  If it is successful, the subagent should only use 2 tools (Read and Edit).
+
+You also need to make sure to update the version_dates.md file with the publish date for the version of Claude Code you are testing.
