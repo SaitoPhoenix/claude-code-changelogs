@@ -1,4 +1,4 @@
-# Claude Code LLM Instructions Changelogs
+# Claude Code Undocumented Changelogs
 
 A project that captures and analyzes Claude Code's evolution by examining raw API traces to Anthropic. We extract system prompts, tool definitions, and data flows to create comprehensive changelogs of the changes to the core LLM instructions and orchestration logic across versions.
 
