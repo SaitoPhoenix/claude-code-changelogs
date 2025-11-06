@@ -1,17 +1,53 @@
-# Claude Code Version Test
+# Claude Code LLM Instructions Changelogs
 
-A toolkit for analyzing and tracking changes in Claude Code versions by examining API traces, system prompts, and tool definitions.
+A project that captures and analyzes Claude Code's evolution by examining raw API traces to Anthropic. We extract system prompts, tool definitions, and data flows to create comprehensive changelogs of the changes to the core LLM instructions and orchestration logic across versions.
 
-## Overview
+## What This Project Does
 
-This project provides three Python scripts and manual workflows to extract, analyze, and compare Claude Code's behavior across different versions:
+This project evaluates a trace of raw API calls made when using Claude Code, then extracts and analyzes:
 
-1. **Extract system prompts** from API trace files
-2. **Extract tool definitions** from API trace files
-3. **Analyze detailed API request flows** to understand behavior patterns
-4. **Manual changelog workflows** for tracking changes between versions
+- **System prompts** - The core instructions that define Claude Code's behavior
+- **Tool definitions** - The tools available to Claude Code and their specifications
+- **Data flows** - Detailed analysis of how raw API calls are structured and sequenced
 
-## Scripts
+Trace's are captured using the claude-trace tool by badlogic.  You can find the tool [here](https://github.com/badlogic/lemmy/tree/main/apps/claude-trace).
+
+## Changelogs
+
+The primary outputs of this project are the changelogs documenting Claude Code's evolution:
+
+### 📋 [Tool Definitions Changelog](tool_definitions_changelog.md)
+
+View changes to Claude Code's available tools across versions - additions, removals, and modifications to tool schemas and descriptions.
+
+### 📋 [System Prompt Changelog](system_prompt_changelog.md)
+
+View changes to Claude Code's core system prompt - the instructions that define its behavior, capabilities, and operational guidelines.
+
+### 📅 [Version Dates](version_dates.md)
+
+Reference for Claude Code version publication dates.
+
+## Detailed Flows
+
+For in-depth analysis of specific version behaviors, detailed API flow analyses are available in `output/detailed_flows/`.
+
+### Flow Structure
+
+Each detailed flow file (`detailed_flow_*.txt`) contains:
+
+- **Request Sequence** - Chronological order of API requests with types and purposes
+- **User Messages** - The actual prompts and interactions from the user
+- **Model Responses** - Claude's responses and reasoning
+- **Tool Calls** - Which tools were invoked and when
+- **Phase Boundaries** - Natural breakpoints in the interaction flow (marked by health checks)
+- **Summary** - Overview with any detected unknown patterns or endpoints
+
+These flows help understand how Claude Code orchestrates API calls to accomplish tasks, revealing the request patterns and decision-making process.
+
+## Contributing
+
+Want to help track these undocumented Claude Code changes or improve the analysis tools? Here's how the project works.
 
 ### 1. `extract_system_prompts.py`
 
