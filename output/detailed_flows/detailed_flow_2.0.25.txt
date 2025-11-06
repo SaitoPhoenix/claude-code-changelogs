@@ -1,0 +1,133 @@
+Analyzing log-2025-10-31-18-20-08_2.0.25.jsonl...
+========================================================================================================================
+DETAILED API FLOW - Claude Code v2.0.25
+========================================================================================================================
+
+NOTE: This analysis auto-detects request types and handles unknowns gracefully.
+      Health checks (GET /api/hello) are used as phase delimiters.
+
+========================================================================================================================
+  [ 0] AUTH       | OAuth authentication
+
+  [ 1] VALIDATE   | Token count validation
+
+  [ 2] MESSAGE    | 💰 Check quota limits
+       Model: claude-haiku-4-5-20251001
+       Msgs: 1, System: False, Tools: False
+       📥 User: quota
+
+  [ 3] MESSAGE    | 🔥 Model warmup
+       Model: claude-haiku-4-5-20251001
+       Msgs: 1, System: True, Tools: False
+       📥 User: Warmup
+
+
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ⬇️  Phase 1 completed - Health check
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  [ 4] HEALTH     | Health check / phase delimiter
+
+  [ 5] MESSAGE    | 🔍 Detect if new topic
+       Model: claude-haiku-4-5-20251001
+       Msgs: 2, System: True, Tools: False
+       📥 User: Hi, what is your name?
+
+  [ 6] MESSAGE    | 💬 Sonnet turn (msgs:1, sys:True)
+       Model: claude-sonnet-4-5-20250929
+       Msgs: 1, System: True, Tools: True
+       📥 User: Hi, what is your name?
+
+
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ⬇️  Phase 2 completed - Health check
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  [ 7] HEALTH     | Health check / phase delimiter
+
+  [ 8] MESSAGE    | 🔍 Detect if new topic
+       Model: claude-haiku-4-5-20251001
+       Msgs: 2, System: True, Tools: False
+       📥 User: Run the following command: `ls -1 | wc -l` and tell me how many files are in the current directory.
+
+  [ 9] MESSAGE    | 💬 Sonnet turn (msgs:3, sys:True)
+       Model: claude-sonnet-4-5-20250929
+       Msgs: 3, System: True, Tools: True
+       📥 User: Hi, what is your name?
+
+  [10] MESSAGE    | 📋 Summarize tool output
+       Model: claude-haiku-4-5-20251001
+       Msgs: 1, System: True, Tools: False
+       📥 User: Command: ls -1 | wc -l
+Output: 2
+
+
+
+  [11] MESSAGE    | 💬 Sonnet turn (msgs:5, sys:True)
+       Model: claude-sonnet-4-5-20250929
+       Msgs: 5, System: True, Tools: True
+       📥 User: Hi, what is your name?
+
+
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ⬇️  Phase 3 completed - Health check
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  [12] HEALTH     | Health check / phase delimiter
+
+  [13] MESSAGE    | 🔍 Detect if new topic
+       Model: claude-haiku-4-5-20251001
+       Msgs: 2, System: True, Tools: False
+       📥 User: Use the Task tool to execute the following steps exactly as written: 
+  1. Read TEST.md 
+  2. Reverse the order of the numbers in the DATA field.
+
+  [14] MESSAGE    | 💬 Sonnet turn (msgs:7, sys:True)
+       Model: claude-sonnet-4-5-20250929
+       Msgs: 7, System: True, Tools: True
+       📥 User: Hi, what is your name?
+
+  [15] MESSAGE    | 💬 Sonnet turn (msgs:1, sys:True)
+       Model: claude-sonnet-4-5-20250929
+       Msgs: 1, System: True, Tools: True
+       📥 User: Execute the following steps exactly as written:
+1. Read TEST.md
+2. Reverse the order of the numbers ... [226 chars]
+
+  [16] MESSAGE    | 💬 Sonnet turn (msgs:3, sys:True)
+       Model: claude-sonnet-4-5-20250929
+       Msgs: 3, System: True, Tools: True
+       📥 User: Execute the following steps exactly as written:
+1. Read TEST.md
+2. Reverse the order of the numbers ... [226 chars]
+
+
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ⬇️  Phase 4 completed - Health check
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  [17] HEALTH     | Health check / phase delimiter
+
+  [18] MESSAGE    | 💬 Sonnet turn (msgs:5, sys:True)
+       Model: claude-sonnet-4-5-20250929
+       Msgs: 5, System: True, Tools: True
+       📥 User: Execute the following steps exactly as written:
+1. Read TEST.md
+2. Reverse the order of the numbers ... [226 chars]
+
+  [19] MESSAGE    | 💬 Sonnet turn (msgs:9, sys:True)
+       Model: claude-sonnet-4-5-20250929
+       Msgs: 9, System: True, Tools: True
+       📥 User: Hi, what is your name?
+
+========================================================================================================================
+ANALYSIS SUMMARY
+========================================================================================================================
+Total requests: 20
+Health check phases: 4
+
+✅ All request types recognized
+
+========================================================================================================================
+END OF FLOW
+========================================================================================================================
