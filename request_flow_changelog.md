@@ -4,6 +4,56 @@
 
 ---
 
+## v2.0.36 • 2025-11-07
+
+**Summary:** Removed title generation, repositioned warmups to initialization, and reordered validation
+**Analysis:** Simplifies initialization by removing conversation title generation and agent state processing from initialization. Moves Sonnet warmup back to initialization sequence and repositions VALIDATE and AUTH. Agent state processing moved to Turn 1. Returns to the dual-warmup initialization pattern with both Haiku and Sonnet warmups occurring before first user interaction.
+**Request Count:** 24 → 23 (-1 request)
+
+### Changes
+
+#### ➕ Added
+- [4] MESSAGE: Sonnet warmup - moved back to initialization from Turn 1
+
+#### ➖ Removed
+- MESSAGE: Generate conversation title (Haiku 4.5) - title generation removed from initialization (was at [3] in v2.0.35)
+- MESSAGE: Agent state JSON processing - removed from initialization (was at [6] in v2.0.35)
+
+#### ↕️ Reordered
+- AUTH moved from [1] to [0] in initialization sequence
+- VALIDATE moved from [0] to [1]
+- Haiku warmup now at [3] in initialization
+- HEALTH check now at [5] (post-warmups)
+- Agent state JSON processing moved from initialization [6] to Turn 1 [7]
+
+---
+
+## v2.0.35 • 2025-11-06
+
+**Summary:** VALIDATE repositioned to first, title generation restored, and Sonnet warmup moved to first turn
+**Analysis:** Major reordering moves token validation to the very first position before authentication, restores conversation title generation removed in v2.0.33, and relocates Sonnet warmup from initialization to first user turn. Introduces agent state JSON processing pattern in initialization. Maintains HEALTH check after initialization but before first turn.
+**Request Count:** 23 → 24 (+1 request)
+
+### Changes
+
+#### ➕ Added
+- [3] MESSAGE: Generate conversation title (Haiku 4.5) - title generation restored
+- [6] MESSAGE: Agent state JSON processing - new Haiku processing pattern for agent state files in initialization
+
+#### ➖ Removed
+- MESSAGE: Sonnet warmup removed from initialization (repositioned to Turn 1)
+
+#### ↕️ Reordered
+- VALIDATE moved from [2] to [0] - now first request in initialization (before AUTH)
+- AUTH moved from [0] to [1]
+- HEALTH check moved from [3] to [4]
+- Haiku warmup moved from [4] to [5]
+- Sonnet warmup moved from initialization [6] to Turn 1 [8]
+
+**Note:** Net of +2 additions and -1 removal, resulting in +1 actual new request.
+
+---
+
 ## v2.0.34 • 2025-11-05
 
 **Summary:** VALIDATE repositioned to first, title generation restored, and health check repositioned

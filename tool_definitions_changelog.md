@@ -6,6 +6,73 @@
 
 ---
 
+## v2.0.36 • 2025-11-07
+
+**Summary:** Fixed Skill tool examples and removed SlashCommand intent matching reminder
+
+**Analysis:** Corrected the Skill tool usage examples to use the proper `skill:` parameter instead of `command:`, aligning with the parameter name change in v2.0.35. Also removed the prominent "Intent Matching" reminder section from SlashCommand tool that was added in v2.0.12.
+
+**Changes:** 2 tools modified • 99.8% similar
+
+### Tool: Skill
+
+#### 🔄 Modified
+- Lines 1166-1168: Fixed usage examples to match parameter name
+
+  **Changed from:**
+  > - `command: "pdf"` - invoke the pdf skill
+  > - `command: "xlsx"` - invoke the xlsx skill
+  > - `command: "ms-office-suite:pdf"` - invoke using fully qualified name
+
+  **Changed to:**
+  > - `skill: "pdf"` - invoke the pdf skill
+  > - `skill: "xlsx"` - invoke the xlsx skill
+  > - `skill: "ms-office-suite:pdf"` - invoke using fully qualified name
+
+### Tool: SlashCommand
+
+#### ➖ Removed
+- Lines 1206-1207: Removed intent matching reminder section
+  > **IMPORTANT - Intent Matching:**
+  > Before starting any task, CHECK if the user's request matches one of the slash commands listed below. This tool exists to route user intentions to specialized workflows.
+
+---
+
+## v2.0.35 • 2025-11-06
+
+**Summary:** Renamed Skill tool parameter from "command" to "skill"
+
+**Analysis:** Updated the Skill tool's parameter name in the JSON schema to better reflect its purpose, changing from the generic "command" to the more specific "skill" for clarity and consistency.
+
+**Changes:** 1 tool modified • 99.9% similar
+
+### Tool: Skill
+
+#### 🔄 Modified
+- Lines 1186, 1192: Renamed parameter in JSON schema
+
+  **Changed from:**
+  > "command": {
+  >   "type": "string",
+  >   "description": "The skill name (no arguments). E.g., \"pdf\" or \"xlsx\""
+  > }
+  > ...
+  > "required": [
+  >   "command"
+  > ]
+
+  **Changed to:**
+  > "skill": {
+  >   "type": "string",
+  >   "description": "The skill name (no arguments). E.g., \"pdf\" or \"xlsx\""
+  > }
+  > ...
+  > "required": [
+  >   "skill"
+  > ]
+
+---
+
 ## v2.0.34 • 2025-11-05
 
 **Summary:** Enhanced Task tool with agent context awareness
