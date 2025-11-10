@@ -120,7 +120,7 @@ assistant: [Uses the Task tool with subagent_type=Explore]
 </example>
 
 
-You can use the following tools without requiring user approval: Bash(chmod:*), Bash(python3:*), Bash(awk:*), Bash(tail:*), WebFetch(domain:www.npmjs.com), WebSearch
+You can use the following tools without requiring user approval: [Approved tools from Claude Code settings]
 
 
 Here is useful information about the environment you are running in:
@@ -154,6 +154,7 @@ user: Where are errors from the client handled?
 assistant: Clients are marked as failed in the `connectToServer` function in src/services/process.ts:712.
 </example>
 
+[Dynamic git repository status injected when in a git repository]
 
 ========================================================================================================================
 END OF SYSTEM PROMPT

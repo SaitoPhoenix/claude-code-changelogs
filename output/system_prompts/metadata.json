@@ -1,7 +1,7 @@
 {
   "versions": {
     "2.0.0": {
-      "trace_file": "log-2025-10-31-21-40-43_2.0.0.jsonl",
+      "trace_file": "log-2025-11-09-21-29-17_2.0.0.jsonl",
       "block_count": 2,
       "entry_idx": 4
     },
@@ -136,7 +136,7 @@
       "entry_idx": 7
     },
     "2.0.34": {
-      "trace_file": "log-2025-11-05-22-18-29_2.0.34.jsonl",
+      "trace_file": "log-2025-11-09-21-15-14_2.0.34.jsonl",
       "block_count": 2,
       "entry_idx": 9
     },
@@ -149,6 +149,16 @@
       "trace_file": "log-2025-11-05-22-15-49_2.0.32.jsonl",
       "block_count": 2,
       "entry_idx": 9
+    },
+    "2.0.35": {
+      "trace_file": "log-2025-11-09-20-41-59_2.0.35.jsonl",
+      "block_count": 2,
+      "entry_idx": 9
+    },
+    "2.0.36": {
+      "trace_file": "log-2025-11-09-20-56-47_2.0.36.jsonl",
+      "block_count": 2,
+      "entry_idx": 8
     }
   },
   "extraction_order": [
@@ -179,6 +189,8 @@
     "2.0.32",
     "2.0.33",
     "2.0.34",
+    "2.0.35",
+    "2.0.36",
     "2.0.5",
     "2.0.8",
     "2.0.9"
